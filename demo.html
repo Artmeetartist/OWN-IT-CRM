@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OWN IT Lead CRM</title>
+    <style>
+        /* --- CORE VARIABLES & RESET --- */
+        :root {
+            --bg-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --text-primary: #111111;
+            --text-secondary: #666666;
+            --brand-black: #000000;
+            --brand-accent: #000000;
+            --border-color: #e5e5e5;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --shadow: 0 2px 8px rgba(0,0,0,0.05);
+            --radius: 12px;
+            --input-bg: #f0f2f5;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 100px; /* Space for sticky footer */
+            line-height: 1.5;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.5px; }
+        p { margin: 0; }
+        .text-sm { font-size: 0.875rem; color: var(--text-secondary); }
+        .text-xs { font-size: 0.75rem; color: var(--text-secondary); }
+
+        /* --- LAYOUT UTILS --- */
+        .container {
+            max-width: 600px; /* Mobile focused, but usable on desktop */
+            margin: 0 auto;
+            padding: 16px;
+        }
+
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 8px; }
+        .gap-4 { gap: 16px; }
+        .mt-2 { margin-top: 8px; }
+        .mt-4 { margin-top: 16px; }
+        .hidden { display: none !important; }
+
+        /* --- COMPONENTS --- */
+        
+        /* Header */
+        header {
+            background: var(--surface-color);
+            padding: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-logo {
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: var(--brand-black);
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            background: var(--surface-color);
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .progress-bar-bg {
+            background: var(--input-bg);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-bar-fill {
+            background: var(--brand-black);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Upload Section */
+        .upload-box {
+            background: var(--surface-color);
+            border: 2px dashed #ccc;
+            border-radius: var(--radius);
+            padding: 32px 16px;
+            text-align: center;
+            margin-top: 24px;
+            cursor: pointer;
+        }
+        .upload-box.dragover { border-color: var(--brand-black); background: #f9f9f9; }
+        
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+            width: 100%;
+        }
+        .btn:active { opacity: 0.8; transform: scale(0.98); }
+        .btn-primary { background: var(--brand-black); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
+        .btn-danger { background: #ffebee; color: var(--danger); }
+        .btn-call { 
+            background: var(--brand-black); 
+            color: white; 
+            text-decoration: none;
+            font-size: 1.1rem;
+        }
+
+        /* Search */
+        .search-bar {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--surface-color);
+            margin-bottom: 16px;
+        }
+
+        /* City Group Headers */
+        .city-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #e0e0e0;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        /* Lead Card */
+        .lead-card {
+            background: var(--surface-color);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid transparent;
+            transition: transform 0.2s;
+        }
+        .lead-card.status-New { border-left-color: #007bff; }
+        .lead-card.status-Called { border-left-color: var(--warning); }
+        .lead-card.status-Interested { border-left-color: var(--success); }
+        .lead-card.status-Closed { border-left-color: var(--text-secondary); }
+        
+        .lead-card.highlight {
+            border: 2px solid var(--brand-black);
+            animation: pulse 1s ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* Status Select */
+        select.status-select {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--input-bg);
+            margin-top: 8px;
+            font-weight: 500;
+        }
+
+        /* Notes Area */
+        textarea.notes-input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            margin-top: 8px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        /* Sticky Footer */
+        .sticky-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface-color);
+            padding: 12px 16px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 12px;
+            z-index: 900;
+            padding-bottom: max(12px, env(safe-area-inset-bottom));
+        }
+
+        /* Modals/Overlays */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="brand-logo">OWN IT <span style="font-weight:300">CRM</span></div>
+        <button id="resetBtn" class="text-sm" style="background:none; border:none; text-decoration:underline; cursor:pointer;">Reset</button>
+    </header>
+
+    <!-- App Container -->
+    <div class="container">
+
+        <!-- View: Upload (Empty State) -->
+        <div id="uploadView" class="hidden">
+            <div style="text-align:center; margin-top:40px;">
+                <h2>Start Your Calls</h2>
+                <p class="text-sm mt-2">Upload your leads CSV to organize and call.</p>
+            </div>
+            
+            <div class="upload-box" id="dropZone">
+                <div style="font-size: 2rem;">📂</div>
+                <h3 class="mt-2">Upload CSV File</h3>
+                <p class="text-xs mt-2">Format: Name, Phone, City</p>
+                <input type="file" id="csvInput" accept=".csv" style="display:none">
+                <button class="btn btn-primary mt-4" onclick="document.getElementById('csvInput').click()">Select File</button>
+            </div>
+
+            <div class="mt-4 text-center">
+                <button onclick="loadDemoData()" class="text-sm" style="background:none; border:none; color: #666; cursor:pointer;">Load Demo Data</button>
+            </div>
+        </div>
+
+        <!-- View: Dashboard -->
+        <div id="dashboardView" class="hidden">
+            
+            <!-- Progress Section -->
+            <div class="progress-container">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-bold">Calling Progress</span>
+                    <span id="progressText" class="text-sm">0 / 0</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="progressBar" class="progress-bar-fill"></div>
+                </div>
+            </div>
+
+            <div style="padding: 16px 0;">
+                <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Search leads...">
+                
+                <div id="leadsContainer">
+                    <!-- Dynamic Content Goes Here -->
+                </div>
+            </div>
+
+            <!-- Bottom Spacer for Sticky Footer -->
+            <div style="height: 60px;"></div>
+        </div>
+
+    </div>
+
+    <!-- Sticky Footer Actions -->
+    <div id="stickyFooter" class="sticky-footer hidden">
+        <button id="callNextBtn" class="btn btn-primary" style="flex: 2;">
+            📞 Call Next Lead
+        </button>
+        <button id="exportBtn" class="btn btn-outline" style="flex: 1;">
+            Save/Export
+        </button>
+    </div>
+
+    <script>
+        /**
+         * OWN IT CRM - Core Logic
+         * No Frameworks. Pure functionality.
+         */
+
+        // --- STATE MANAGEMENT ---
+        const APP_KEY = 'ownit_crm_leads';
+        let state = {
+            leads: [],
+            expandedCities: new Set()
+        };
+
+        // --- DOM ELEMENTS ---
+        const els = {
+            uploadView: document.getElementById('uploadView'),
+            dashboardView: document.getElementById('dashboardView'),
+            leadsContainer: document.getElementById('leadsContainer'),
+            csvInput: document.getElementById('csvInput'),
+            progressBar: document.getElementById('progressBar'),
+            progressText: document.getElementById('progressText'),
+            stickyFooter: document.getElementById('stickyFooter'),
+            callNextBtn: document.getElementById('callNextBtn'),
+            searchInput: document.getElementById('searchInput'),
+            resetBtn: document.getElementById('resetBtn'),
+            exportBtn: document.getElementById('exportBtn')
+        };
+
+        // --- INITIALIZATION ---
+        function init() {
+            const stored = localStorage.getItem(APP_KEY);
+            if (stored) {
+                try {
+                    state.leads = JSON.parse(stored);
+                    showDashboard();
+                } catch (e) {
+                    console.error("Data corruption", e);
+                    localStorage.removeItem(APP_KEY);
+                    showUpload();
+                }
+            } else {
+                showUpload();
+            }
+        }
+
+        // --- DATA PERSISTENCE ---
+        function saveData() {
+            localStorage.setItem(APP_KEY, JSON.stringify(state.leads));
+            updateProgress();
+        }
+
+        // --- VIEW SWITCHING ---
+        function showUpload() {
+            els.uploadView.classList.remove('hidden');
+            els.dashboardView.classList.add('hidden');
+            els.stickyFooter.classList.add('hidden');
+        }
+
+        function showDashboard() {
+            els.uploadView.classList.add('hidden');
+            els.dashboardView.classList.remove('hidden');
+            els.stickyFooter.classList.remove('hidden');
+            renderLeads();
+            updateProgress();
+        }
+
+        // --- CSV PARSING ---
+        els.csvInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const text = event.target.result;
+                parseCSV(text);
+            };
+            reader.readAsText(file);
+        });
+
+        function parseCSV(csvText) {
+            const lines = csvText.split(/\r\n|\n/);
+            const leads = [];
+            
+            // Skip header (index 0) if it exists, roughly check
+            let startIndex = 0;
+            if(lines[0].toLowerCase().includes('name')) startIndex = 1;
+
+            for (let i = startIndex; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                // Simple split by comma (doesn't handle quoted commas, simple implementation requested)
+                const cols = line.split(',');
+                if (cols.length >= 2) {
+                    leads.push({
+                        id: Date.now() + Math.random().toString(36).substr(2, 9),
+                        name: cols[0].trim(),
+                        phone: cols[1].trim(),
+                        city: cols[2] ? cols[2].trim() : 'Unknown',
+                        status: 'New',
+                        notes: ''
+                    });
+                }
+            }
+
+            if (leads.length > 0) {
+                state.leads = leads;
+                saveData();
+                showDashboard();
+            } else {
+                alert("No valid leads found in CSV.");
+            }
+        }
+
+        function loadDemoData() {
+            const demoCSV = `Name,Phone,City
+Rahul,9876543210,Hyderabad
+Anita,9988776655,Bangalore
+Suresh,9123456789,Hyderabad
+Priya,9898989898,Mumbai
+John,9999999999,Bangalore
+Amit,8888888888,Delhi`;
+            parseCSV(demoCSV);
+        }
+
+        // --- RENDERING LOGIC ---
+        function renderLeads() {
+            const container = els.leadsContainer;
+            container.innerHTML = '';
+
+            const searchTerm = els.searchInput.value.toLowerCase();
+
+            // 1. Group by City
+            const cityGroups = {};
+            state.leads.forEach(lead => {
+                // Filter by search
+                if (searchTerm && !lead.name.toLowerCase().includes(searchTerm) && !lead.phone.includes(searchTerm)) {
+                    return;
+                }
+                
+                const city = lead.city || 'Other';
+                if (!cityGroups[city]) cityGroups[city] = [];
+                cityGroups[city].push(lead);
+            });
+
+            // 2. Render Groups
+            const cities = Object.keys(cityGroups).sort();
+            
+            if (cities.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">No leads found.</div>';
+                return;
+            }
+
+            cities.forEach(city => {
+                const leadsInCity = cityGroups[city];
+                const isExpanded = state.expandedCities.has(city) || searchTerm.length > 0; // Auto expand on search
+
+                // City Header
+                const header = document.createElement('div');
+                header.className = 'city-header';
+                header.innerHTML = `
+                    <span>📍 ${city}</span>
+                    <span class="text-sm" style="background:white; padding:2px 8px; border-radius:12px;">${leadsInCity.length}</span>
+                `;
+                header.onclick = () => toggleCity(city);
+                container.appendChild(header);
+
+                // Leads List Wrapper
+                const listWrapper = document.createElement('div');
+                listWrapper.className = isExpanded ? '' : 'hidden';
+                
+                leadsInCity.forEach(lead => {
+                    const card = createLeadCard(lead);
+                    listWrapper.appendChild(card);
+                });
+
+                container.appendChild(listWrapper);
+            });
+        }
+
+        function createLeadCard(lead) {
+            const card = document.createElement('div');
+            card.className = `lead-card status-${lead.status.replace(' ','')}`;
+            card.id = `lead-${lead.id}`;
+
+            const statusOptions = ['New', 'Called', 'Interested', 'Follow-Up', 'Closed', 'Not Answered'];
+            
+            let optionsHtml = '';
+            statusOptions.forEach(opt => {
+                optionsHtml += `<option value="${opt}" ${lead.status === opt ? 'selected' : ''}>${opt}</option>`;
+            });
+
+            card.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 style="font-size:1.1rem;">${lead.name}</h3>
+                        <div class="text-sm mt-2">📱 ${formatPhone(lead.phone)}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <span class="text-xs" style="text-transform:uppercase; font-weight:bold; opacity:0.6;">Status</span>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex gap-4">
+                    <a href="tel:${lead.phone}" class="btn btn-call" style="flex:1;" onclick="markAsCalled('${lead.id}')">
+                        📞 Call
+                    </a>
+                </div>
+
+                <div class="mt-4">
+                    <select class="status-select" onchange="updateLeadStatus('${lead.id}', this.value)">
+                        ${optionsHtml}
+                    </select>
+                    <textarea class="notes-input" placeholder="Add notes here..." oninput="updateLeadNotes('${lead.id}', this.value)">${lead.notes}</textarea>
+                </div>
+            `;
+            return card;
+        }
+
+        function toggleCity(city) {
+            if (state.expandedCities.has(city)) {
+                state.expandedCities.delete(city);
+            } else {
+                state.expandedCities.add(city);
+            }
+            renderLeads();
+        }
+
+        // --- UPDATES & ACTIONS ---
+
+        function updateLeadStatus(id, newStatus) {
+            const lead = state.leads.find(l => l.id === id);
+            if (lead) {
+                lead.status = newStatus;
+                saveData();
+                // Update card visual class immediately without full re-render for performance
+                const card = document.getElementById(`lead-${id}`);
+                if(card) {
+                    card.className = card.className.replace(/status-[\w-]+/g, '') + ` status-${newStatus.replace(' ','')}`;
+                }
+            }
+        }
+
+        function updateLeadNotes(id, notes) {
+            const lead = state.leads.find(l => l.id === id);
+            if (lead) {
+                lead.notes = notes;
+                saveData(); // Note: frequent saving on keystroke. Could debounce, but localstorage is fast enough for this size.
+            }
+        }
+
+        function markAsCalled(id) {
+            // When user clicks Call, auto-update status to "Called" if it was "New"
+            const lead = state.leads.find(l => l.id === id);
+            if (lead && lead.status === 'New') {
+                updateLeadStatus(id, 'Called');
+                // Reflect change in UI select box
+                const card = document.getElementById(`lead-${id}`);
+                const select = card.querySelector('select');
+                if (select) select.value = 'Called';
+            }
+        }
+
+        function updateProgress() {
+            const total = state.leads.length;
+            if (total === 0) return;
+
+            const completed = state.leads.filter(l => l.status !== 'New').length;
+            const percent = Math.round((completed / total) * 100);
+
+            els.progressText.innerText = `${completed} / ${total}`;
+            els.progressBar.style.width = `${percent}%`;
+        }
+
+        // --- CALL NEXT LOGIC ---
+        els.callNextBtn.addEventListener('click', () => {
+            // Find first lead that is 'New'
+            const nextLead = state.leads.find(l => l.status === 'New');
+            
+            if (nextLead) {
+                // Ensure the city is expanded
+                state.expandedCities.add(nextLead.city);
+                
+                // Need to re-render to ensure DOM element exists if city was closed
+                renderLeads(); 
+
+                setTimeout(() => {
+                    const card = document.getElementById(`lead-${nextLead.id}`);
+                    if (card) {
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        card.classList.add('highlight');
+                        setTimeout(() => card.classList.remove('highlight'), 2000);
+                    }
+                }, 100);
+            } else {
+                alert("All leads called! Great job.");
+            }
+        });
+
+        // --- UTILS ---
+        function formatPhone(phone) {
+            // Basic formatting
+            return phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
+        }
+
+        els.searchInput.addEventListener('input', () => {
+            renderLeads();
+        });
+
+        els.resetBtn.addEventListener('click', () => {
+            if(confirm("Are you sure you want to delete all data and reset?")) {
+                localStorage.removeItem(APP_KEY);
+                location.reload();
+            }
+        });
+
+        els.exportBtn.addEventListener('click', () => {
+            // Simple CSV Export
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Name,Phone,City,Status,Notes\n";
+            
+            state.leads.forEach(row => {
+                csvContent += `${row.name},${row.phone},${row.city},${row.status},"${row.notes.replace(/"/g, '""')}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", "own_it_leads_export.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Run Init
+        init();
+
+    </script>
+</body>
+</html>
