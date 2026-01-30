@@ -7,19 +7,23 @@
     <style>
         /* --- CORE VARIABLES & RESET --- */
         :root {
-            --bg-color: #f8f9fa;
+            --bg-color: #f4f6f8;
             --surface-color: #ffffff;
-            --text-primary: #111111;
-            --text-secondary: #666666;
-            --brand-black: #000000;
-            --brand-accent: #000000;
-            --border-color: #e5e5e5;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
-            --shadow: 0 2px 8px rgba(0,0,0,0.05);
-            --radius: 12px;
-            --input-bg: #f0f2f5;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --brand-black: #111827;
+            --brand-accent: #10b981; /* Green Accent */
+            --border-color: #e5e7eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --cold: #9ca3af;
+            --gold: #d97706;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 16px;
+            --input-bg: #f9fafb;
+            --bottom-nav-height: 80px;
         }
 
         * {
@@ -33,19 +37,21 @@
             color: var(--text-primary);
             margin: 0;
             padding: 0;
-            padding-bottom: 100px; /* Space for sticky footer */
+            padding-bottom: calc(var(--bottom-nav-height) + 20px);
             line-height: 1.5;
+            overflow-x: hidden;
         }
 
         /* --- TYPOGRAPHY --- */
-        h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.5px; }
+        h1, h2, h3 { margin: 0; font-weight: 700; letter-spacing: -0.025em; }
         p { margin: 0; }
         .text-sm { font-size: 0.875rem; color: var(--text-secondary); }
         .text-xs { font-size: 0.75rem; color: var(--text-secondary); }
+        .font-bold { font-weight: 700; }
 
         /* --- LAYOUT UTILS --- */
         .container {
-            max-width: 600px; /* Mobile focused, but usable on desktop */
+            max-width: 600px;
             margin: 0 auto;
             padding: 16px;
         }
@@ -58,6 +64,7 @@
         .gap-4 { gap: 16px; }
         .mt-2 { margin-top: 8px; }
         .mt-4 { margin-top: 16px; }
+        .mb-4 { margin-bottom: 16px; }
         .hidden { display: none !important; }
 
         /* --- COMPONENTS --- */
@@ -65,7 +72,7 @@
         /* Header */
         header {
             background: var(--surface-color);
-            padding: 16px;
+            padding: 16px 20px;
             position: sticky;
             top: 0;
             z-index: 100;
@@ -73,178 +80,296 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .brand-logo {
             font-size: 1.25rem;
-            font-weight: 900;
+            font-weight: 800;
             color: var(--brand-black);
-            text-transform: uppercase;
-            letter-spacing: -1px;
         }
 
-        /* Progress Bar */
-        .progress-container {
+        /* Dashboard Stats / Filters */
+        .stats-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px 0 12px 0;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE 10+ */
+        }
+        .stats-row::-webkit-scrollbar { display: none; /* Chrome/Safari */ }
+
+        .stat-chip {
             background: var(--surface-color);
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border-color);
+            border: 1px solid var(--border-color);
+            border-radius: 99px;
+            padding: 6px 16px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
-        .progress-bar-bg {
-            background: var(--input-bg);
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-        .progress-bar-fill {
+        .stat-chip.active {
             background: var(--brand-black);
-            height: 100%;
-            width: 0%;
-            transition: width 0.3s ease;
+            color: white;
+            border-color: var(--brand-black);
         }
+        .stat-chip strong { font-weight: 700; }
 
         /* Upload Section */
         .upload-box {
             background: var(--surface-color);
-            border: 2px dashed #ccc;
+            border: 2px dashed #d1d5db;
             border-radius: var(--radius);
-            padding: 32px 16px;
+            padding: 40px 20px;
             text-align: center;
             margin-top: 24px;
             cursor: pointer;
+            transition: 0.2s;
         }
-        .upload-box.dragover { border-color: var(--brand-black); background: #f9f9f9; }
+        .upload-box:active { background: #f3f4f6; border-color: var(--brand-black); }
         
         /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 14px 20px;
+            border-radius: 12px;
             font-weight: 600;
             border: none;
             cursor: pointer;
             font-size: 1rem;
-            transition: opacity 0.2s;
+            transition: transform 0.1s;
             width: 100%;
-        }
-        .btn:active { opacity: 0.8; transform: scale(0.98); }
-        .btn-primary { background: var(--brand-black); color: white; }
-        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
-        .btn-danger { background: #ffebee; color: var(--danger); }
-        .btn-call { 
-            background: var(--brand-black); 
-            color: white; 
             text-decoration: none;
-            font-size: 1.1rem;
         }
-
+        .btn:active { transform: scale(0.97); }
+        .btn-primary { background: var(--brand-black); color: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        .btn-success { background: var(--brand-accent); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); }
+        
         /* Search */
         .search-bar {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: 1px solid var(--border-color);
-            border-radius: 8px;
+            border-radius: 12px;
             font-size: 1rem;
             background: var(--surface-color);
             margin-bottom: 16px;
+            outline: none;
         }
+        .search-bar:focus { border-color: var(--brand-black); }
 
-        /* City Group Headers */
-        .city-header {
+        /* Segment Group Headers */
+        .segment-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #e0e0e0;
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-top: 16px;
-            margin-bottom: 8px;
+            background: #ffffff;
+            padding: 14px 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+            margin-bottom: 12px;
             cursor: pointer;
             font-weight: 700;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
         }
 
         /* Lead Card */
         .lead-card {
             background: var(--surface-color);
             border-radius: var(--radius);
-            padding: 16px;
-            margin-bottom: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
             box-shadow: var(--shadow);
-            border-left: 4px solid transparent;
-            transition: transform 0.2s;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .lead-card.status-New { border-left-color: #007bff; }
-        .lead-card.status-Called { border-left-color: var(--warning); }
-        .lead-card.status-Interested { border-left-color: var(--success); }
-        .lead-card.status-Closed { border-left-color: var(--text-secondary); }
+        
+        /* Status Badges on Card */
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .bg-new { background: #eff6ff; color: #1d4ed8; }
+        .bg-called { background: #fffbeb; color: #b45309; }
+        .bg-interested { background: #ecfdf5; color: #047857; }
+        .bg-closed { background: #f3f4f6; color: #4b5563; }
+        
+        /* New Status Colors */
+        .bg-appointment { background: #e0e7ff; color: #3730a3; } /* Indigo */
+        .bg-sale { background: #d1fae5; color: #065f46; } /* Green */
+        .bg-callback { background: #ffedd5; color: #9a3412; } /* Orange */
+
+
+        /* Smart Tag */
+        .smart-tag {
+            font-size: 0.7rem;
+            color: #888;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .tag-high-value {
+            color: var(--gold);
+            font-weight: 700;
+            background: #fffbeb;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .tag-rating {
+            color: var(--brand-black);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        /* Temperature Strip */
+        .temp-strip {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 6px;
+        }
+        .temp-hot { background: var(--danger); }
+        .temp-warm { background: var(--warning); }
+        .temp-cold { background: var(--cold); }
         
         .lead-card.highlight {
             border: 2px solid var(--brand-black);
-            animation: pulse 1s ease;
+            box-shadow: 0 0 0 4px rgba(0,0,0,0.1);
+            transform: scale(1.02);
+            z-index: 10;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); }
+        /* Form Elements */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 16px;
         }
 
-        /* Status Select */
-        select.status-select {
+        select.custom-select {
             width: 100%;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 10px;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
             background: var(--input-bg);
-            margin-top: 8px;
             font-weight: 500;
+            font-size: 0.9rem;
+            outline: none;
         }
 
-        /* Notes Area */
         textarea.notes-input {
             width: 100%;
-            padding: 8px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
-            margin-top: 8px;
+            margin-top: 10px;
             font-family: inherit;
-            resize: vertical;
-            min-height: 60px;
+            resize: none;
+            min-height: 80px;
+            background: var(--input-bg);
+            font-size: 0.95rem;
         }
 
-        /* Sticky Footer */
-        .sticky-footer {
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1100;
+            padding: 20px;
+        }
+        .modal-box {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 340px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        .modal-btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
+            height: var(--bottom-nav-height);
             background: var(--surface-color);
-            padding: 12px 16px;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 12px;
+            justify-content: space-around;
+            align-items: center;
             z-index: 900;
-            padding-bottom: max(12px, env(safe-area-inset-bottom));
+            padding-bottom: env(safe-area-inset-bottom);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
         }
 
-        /* Modals/Overlays */
-        .overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.5);
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 60px;
+        }
+        .nav-icon { font-size: 1.5rem; margin-bottom: 2px; }
+        
+        .nav-main-action {
+            background: var(--brand-black);
+            color: white;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            margin-bottom: 20px; /* Float up */
+            font-size: 1.5rem;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
         }
-        .modal {
-            background: white;
-            padding: 24px;
-            border-radius: 16px;
-            width: 90%;
-            max-width: 400px;
+        .nav-main-action:active { transform: scale(0.9); }
+        .nav-main-text {
+            position: absolute;
+            bottom: -22px;
+            font-size: 0.75rem;
+            color: var(--brand-black);
+            font-weight: 600;
+            width: 80px;
             text-align: center;
         }
 
@@ -255,7 +380,7 @@
     <!-- Header -->
     <header>
         <div class="brand-logo">OWN IT <span style="font-weight:300">CRM</span></div>
-        <button id="resetBtn" class="text-sm" style="background:none; border:none; text-decoration:underline; cursor:pointer;">Reset</button>
+        <button id="resetBtn" class="text-xs" style="background:none; border:none; text-decoration:underline; cursor:pointer; color: var(--text-secondary);">Clear Data</button>
     </header>
 
     <!-- App Container -->
@@ -269,53 +394,79 @@
             </div>
             
             <div class="upload-box" id="dropZone">
-                <div style="font-size: 2rem;">📂</div>
-                <h3 class="mt-2">Upload CSV File</h3>
-                <p class="text-xs mt-2">Format: Name, Phone, City</p>
+                <div style="font-size: 2.5rem; margin-bottom:10px;">📂</div>
+                <h3 class="font-bold">Upload CSV File</h3>
+                <p class="text-xs mt-2 text-secondary">Supports Business Names, Ratings, Scores</p>
                 <input type="file" id="csvInput" accept=".csv" style="display:none">
-                <button class="btn btn-primary mt-4" onclick="document.getElementById('csvInput').click()">Select File</button>
+                <button class="btn btn-primary mt-4" style="max-width:200px" onclick="document.getElementById('csvInput').click()">Select File</button>
             </div>
 
             <div class="mt-4 text-center">
-                <button onclick="loadDemoData()" class="text-sm" style="background:none; border:none; color: #666; cursor:pointer;">Load Demo Data</button>
+                <button onclick="loadDemoData()" class="text-sm" style="background:none; border:none; color: var(--info); cursor:pointer;">Load Demo Data</button>
             </div>
         </div>
 
         <!-- View: Dashboard -->
         <div id="dashboardView" class="hidden">
             
-            <!-- Progress Section -->
-            <div class="progress-container">
-                <div class="flex justify-between items-center">
-                    <span class="text-sm font-bold">Calling Progress</span>
-                    <span id="progressText" class="text-sm">0 / 0</span>
-                </div>
-                <div class="progress-bar-bg">
-                    <div id="progressBar" class="progress-bar-fill"></div>
-                </div>
+            <!-- Filter / Stats Row -->
+            <div class="stats-row" id="statsRow">
+                <!-- Injected via JS -->
             </div>
 
-            <div style="padding: 16px 0;">
-                <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Search leads...">
+            <div style="padding: 10px 0;">
+                <input type="text" id="searchInput" class="search-bar" placeholder="🔍 Search name, business or phone...">
                 
                 <div id="leadsContainer">
                     <!-- Dynamic Content Goes Here -->
                 </div>
             </div>
-
-            <!-- Bottom Spacer for Sticky Footer -->
-            <div style="height: 60px;"></div>
         </div>
 
     </div>
 
-    <!-- Sticky Footer Actions -->
-    <div id="stickyFooter" class="sticky-footer hidden">
-        <button id="callNextBtn" class="btn btn-primary" style="flex: 2;">
-            📞 Call Next Lead
+    <!-- Call Confirmation Modal -->
+    <div id="callModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div style="font-size:2rem; margin-bottom:10px;">📞</div>
+            <h3 id="modalLeadName">Call Name</h3>
+            <p id="modalLeadPhone" class="text-sm mt-2 font-bold">+91 00000 00000</p>
+            
+            <div class="text-xs mt-4" style="background: #f3f4f6; padding: 10px; border-radius: 8px; color: #555;">
+                <strong>Permission to Call:</strong><br>
+                Pressing "Dial" will open your phone app.<br>
+                You can select <strong>SIM 1</strong> or <strong>SIM 2</strong> there.
+            </div>
+
+            <div style="margin-top:12px; text-align:left; font-size:0.85rem; display:flex; align-items:center; justify-content:center; gap:6px;">
+                <input type="checkbox" id="dontAskAgain">
+                <label for="dontAskAgain">Don't ask me again</label>
+            </div>
+
+            <div class="modal-btn-row">
+                <button class="btn btn-outline" onclick="closeCallModal()">Cancel</button>
+                <button class="btn btn-primary" id="confirmCallBtn">Dial Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div id="bottomNav" class="bottom-nav hidden">
+        <button class="nav-item" onclick="setFilter('all')">
+            <span class="nav-icon">🏠</span>
+            <span>Leads</span>
         </button>
-        <button id="exportBtn" class="btn btn-outline" style="flex: 1;">
-            Save/Export
+        
+        <div style="position:relative; display:flex; justify-content:center;">
+            <button id="callNextBtn" class="nav-main-action">
+                📞
+            </button>
+            <span class="nav-main-text">Call Next</span>
+        </div>
+
+        <button class="nav-item" id="exportBtn">
+            <span class="nav-icon">📤</span>
+            <span>Export</span>
         </button>
     </div>
 
@@ -327,9 +478,12 @@
 
         // --- STATE MANAGEMENT ---
         const APP_KEY = 'ownit_crm_leads';
+        const SKIP_CONFIRM_KEY = 'ownit_skip_call_confirm';
         let state = {
             leads: [],
-            expandedCities: new Set()
+            expandedSegments: new Set(),
+            currentFilter: 'all', // 'all', 'Hot', 'Warm', 'Cold', 'New', 'Called'
+            pendingCallId: null
         };
 
         // --- DOM ELEMENTS ---
@@ -338,13 +492,18 @@
             dashboardView: document.getElementById('dashboardView'),
             leadsContainer: document.getElementById('leadsContainer'),
             csvInput: document.getElementById('csvInput'),
-            progressBar: document.getElementById('progressBar'),
-            progressText: document.getElementById('progressText'),
-            stickyFooter: document.getElementById('stickyFooter'),
+            bottomNav: document.getElementById('bottomNav'),
             callNextBtn: document.getElementById('callNextBtn'),
             searchInput: document.getElementById('searchInput'),
             resetBtn: document.getElementById('resetBtn'),
-            exportBtn: document.getElementById('exportBtn')
+            exportBtn: document.getElementById('exportBtn'),
+            statsRow: document.getElementById('statsRow'),
+            // Modal Elements
+            callModal: document.getElementById('callModal'),
+            modalLeadName: document.getElementById('modalLeadName'),
+            modalLeadPhone: document.getElementById('modalLeadPhone'),
+            confirmCallBtn: document.getElementById('confirmCallBtn'),
+            dontAskCheckbox: document.getElementById('dontAskAgain')
         };
 
         // --- INITIALIZATION ---
@@ -353,6 +512,12 @@
             if (stored) {
                 try {
                     state.leads = JSON.parse(stored);
+                    // Migration: Ensure new fields exist
+                    state.leads.forEach(l => {
+                        if(!l.temp) l.temp = 'Cold';
+                        if(!l.business) l.business = '';
+                        if(!l.segment) l.segment = l.city || 'General'; // Migration for segment
+                    });
                     showDashboard();
                 } catch (e) {
                     console.error("Data corruption", e);
@@ -364,25 +529,25 @@
             }
         }
 
-        // --- DATA PERSISTENCE ---
+        // --- DATA PERSISTENCE (Auto-Save) ---
         function saveData() {
             localStorage.setItem(APP_KEY, JSON.stringify(state.leads));
-            updateProgress();
+            renderStats(); // Update stats whenever data changes
         }
 
         // --- VIEW SWITCHING ---
         function showUpload() {
             els.uploadView.classList.remove('hidden');
             els.dashboardView.classList.add('hidden');
-            els.stickyFooter.classList.add('hidden');
+            els.bottomNav.classList.add('hidden');
         }
 
         function showDashboard() {
             els.uploadView.classList.add('hidden');
             els.dashboardView.classList.remove('hidden');
-            els.stickyFooter.classList.remove('hidden');
+            els.bottomNav.classList.remove('hidden');
+            renderStats();
             renderLeads();
-            updateProgress();
         }
 
         // --- CSV PARSING ---
@@ -392,56 +557,239 @@
 
             const reader = new FileReader();
             reader.onload = function(event) {
-                const text = event.target.result;
-                parseCSV(text);
+                parseCSV(event.target.result);
             };
             reader.readAsText(file);
         });
 
+        function parseCSVLine(text) {
+            // Robust CSV regex to handle quoted commas: "Street, City", 123
+            const result = [];
+            let startValueIndex = 0;
+            let inQuotes = false;
+            
+            for (let i = 0; i < text.length; i++) {
+                if (text[i] === '"') {
+                    inQuotes = !inQuotes;
+                } else if (text[i] === ',' && !inQuotes) {
+                    let val = text.substring(startValueIndex, i).trim();
+                    // Remove surrounding quotes if present
+                    if(val.startsWith('"') && val.endsWith('"')) val = val.slice(1,-1);
+                    result.push(val);
+                    startValueIndex = i + 1;
+                }
+            }
+            let lastVal = text.substring(startValueIndex).trim();
+            if(lastVal.startsWith('"') && lastVal.endsWith('"')) lastVal = lastVal.slice(1,-1);
+            result.push(lastVal);
+            return result;
+        }
+
         function parseCSV(csvText) {
-            const lines = csvText.split(/\r\n|\n/);
+            // Normalize line endings
+            const lines = csvText.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
             const leads = [];
             
-            // Skip header (index 0) if it exists, roughly check
-            let startIndex = 0;
-            if(lines[0].toLowerCase().includes('name')) startIndex = 1;
-
-            for (let i = startIndex; i < lines.length; i++) {
-                const line = lines[i].trim();
-                if (!line) continue;
-                
-                // Simple split by comma (doesn't handle quoted commas, simple implementation requested)
-                const cols = line.split(',');
-                if (cols.length >= 2) {
-                    leads.push({
-                        id: Date.now() + Math.random().toString(36).substr(2, 9),
-                        name: cols[0].trim(),
-                        phone: cols[1].trim(),
-                        city: cols[2] ? cols[2].trim() : 'Unknown',
-                        status: 'New',
-                        notes: ''
-                    });
+            // 1. Identify Headers
+            let headerIdx = -1;
+            let headers = [];
+            
+            // Scan first few lines to find header row (contains 'Phone' or 'Name' or 'Business')
+            for(let i=0; i<Math.min(lines.length, 10); i++) {
+                const row = parseCSVLine(lines[i]);
+                const rowStr = row.join(' ').toLowerCase();
+                if(rowStr.includes('phone') || rowStr.includes('name') || rowStr.includes('business') || rowStr.includes('mobile')) {
+                    headerIdx = i;
+                    headers = row.map(h => h.toLowerCase().trim());
+                    break;
                 }
             }
 
+            if(headerIdx === -1) {
+                // Fallback: Assume first row if it looks populated and isn't empty
+                if(lines[0] && lines[0].includes(',')) {
+                    headerIdx = 0;
+                    headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().trim());
+                } else {
+                    alert("Could not identify headers. Please ensure your CSV has 'Name' or 'Phone' columns.");
+                    return;
+                }
+            }
+
+            // 2. Map Columns
+            // PRIORITY: Find exact match for Phone/Mobile first to avoid empty "Owner Phone"
+            let phoneIdx = headers.indexOf('phone');
+            if (phoneIdx === -1) phoneIdx = headers.indexOf('mobile');
+            if (phoneIdx === -1) phoneIdx = headers.findIndex(h => h.includes('phone') || h.includes('mobile'));
+
+            // Auto-detect segments
+            let segmentIdx = headers.indexOf('segment');
+            if(segmentIdx === -1) segmentIdx = headers.indexOf('city');
+            if(segmentIdx === -1) segmentIdx = headers.indexOf('location');
+            if(segmentIdx === -1) segmentIdx = headers.indexOf('state');
+            if(segmentIdx === -1) segmentIdx = headers.indexOf('category');
+
+            const colMap = {
+                name: headers.indexOf('owner name') > -1 ? headers.indexOf('owner name') : headers.indexOf('name'),
+                phone: phoneIdx,
+                city: headers.indexOf('city'),
+                business: headers.indexOf('business name') > -1 ? headers.indexOf('business name') : headers.indexOf('business'),
+                score: headers.indexOf('lead score'),
+                rating: headers.indexOf('rating'),
+                reviews: headers.indexOf('reviews'),
+                notes: headers.indexOf('sales note'),
+                segment: segmentIdx
+            };
+
+            // 3. Parse Rows
+            for (let i = headerIdx + 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                
+                const cols = parseCSVLine(line);
+                
+                // Smart Name Logic: Owner Name -> Business Name -> 'Unknown'
+                let name = 'Unknown';
+                if(colMap.name > -1 && cols[colMap.name]) name = cols[colMap.name];
+                
+                // Fallback to Business Name if Name is empty or 'Unknown'
+                if((!name || name === 'Unknown') && colMap.business > -1 && cols[colMap.business]) {
+                    name = cols[colMap.business];
+                }
+
+                // Smart Phone Logic
+                let phone = '';
+                if(colMap.phone > -1 && cols[colMap.phone]) phone = cols[colMap.phone];
+
+                // Skip if no phone
+                if(!phone) continue;
+
+                // Extraction
+                const city = (colMap.city > -1 && cols[colMap.city]) ? cols[colMap.city] : 'Unknown';
+                const business = (colMap.business > -1 && cols[colMap.business]) ? cols[colMap.business] : '';
+                const score = (colMap.score > -1 && cols[colMap.score]) ? cols[colMap.score] : '0';
+                const rating = (colMap.rating > -1 && cols[colMap.rating]) ? cols[colMap.rating] : '';
+                const reviews = (colMap.reviews > -1 && cols[colMap.reviews]) ? cols[colMap.reviews] : '';
+                
+                // Determine Segment
+                let segment = 'General';
+                if(colMap.segment > -1 && cols[colMap.segment]) {
+                    segment = cols[colMap.segment];
+                } else if (city !== 'Unknown') {
+                    segment = city;
+                }
+
+                // Auto Temperature Logic
+                let temp = 'Cold';
+                const reviewCount = parseInt(reviews) || 0;
+                const ratingVal = parseFloat(rating) || 0;
+                
+                if (reviewCount > 50 || ratingVal >= 4.8 || (score && parseInt(score) > 50)) {
+                    temp = 'Hot'; // High Value Lead
+                } else if (reviewCount > 10 || ratingVal >= 4.0) {
+                    temp = 'Warm';
+                }
+
+                leads.push({
+                    id: Date.now() + Math.random().toString(36).substr(2, 9),
+                    name: name,
+                    phone: phone,
+                    city: city,
+                    business: business,
+                    segment: segment,
+                    status: 'New',
+                    temp: temp,
+                    rating: rating,
+                    reviews: reviews,
+                    notes: ''
+                });
+            }
+
             if (leads.length > 0) {
-                state.leads = leads;
+                if(state.leads.length > 0 && confirm("Append to existing leads? Cancel to replace.")) {
+                    state.leads = [...state.leads, ...leads];
+                } else {
+                    state.leads = leads;
+                }
                 saveData();
                 showDashboard();
             } else {
-                alert("No valid leads found in CSV.");
+                alert("No valid leads found in CSV. Please check that 'Phone' column exists and is populated.");
             }
         }
 
         function loadDemoData() {
-            const demoCSV = `Name,Phone,City
-Rahul,9876543210,Hyderabad
-Anita,9988776655,Bangalore
-Suresh,9123456789,Hyderabad
-Priya,9898989898,Mumbai
-John,9999999999,Bangalore
-Amit,8888888888,Delhi`;
+            // Updated Demo Data with Business Names and City
+            const demoCSV = `Name,Phone,City,Business,Rating,Reviews
+Rahul Sharma,9876543210,Hyderabad,Tech Solutions Ltd,4.2,12
+Anita Desai,9988776655,Bangalore,Creative Designs,5.0,150
+Suresh Kumar,9123456789,Hyderabad,Kumar Trading,3.5,5
+Priya Singh,9898989898,Mumbai,Singh Enterprises,4.9,80
+John Doe,9999999999,Bangalore,JD Consultants,4.5,20
+Amit Patel,8888888888,Delhi,Patel Exports,4.0,15`;
             parseCSV(demoCSV);
+        }
+
+        // --- STATS & FILTERING ---
+        function getStats() {
+            const total = state.leads.length;
+            const hot = state.leads.filter(l => l.temp === 'Hot').length;
+            // Pending: New, No Answer, or Call Back
+            const pending = state.leads.filter(l => ['New', 'Not Answered', 'Call Back'].includes(l.status)).length;
+            // Done: Everything else
+            const done = state.leads.filter(l => !['New', 'Not Answered', 'Call Back'].includes(l.status)).length;
+            return { total, hot, pending, done };
+        }
+
+        function setFilter(filterType) {
+            state.currentFilter = filterType;
+            renderStats(); // Update active chip
+            renderLeads();
+        }
+
+        function renderStats() {
+            const s = getStats();
+            const f = state.currentFilter;
+            
+            els.statsRow.innerHTML = `
+                <div class="stat-chip ${f === 'all' ? 'active' : ''}" onclick="setFilter('all')">
+                    📋 All <strong>${s.total}</strong>
+                </div>
+                <div class="stat-chip ${f === 'Hot' ? 'active' : ''}" onclick="setFilter('Hot')">
+                    🔥 Hot <strong>${s.hot}</strong>
+                </div>
+                <div class="stat-chip ${f === 'pending' ? 'active' : ''}" onclick="setFilter('pending')">
+                    ⏳ Pending <strong>${s.pending}</strong>
+                </div>
+                <div class="stat-chip ${f === 'done' ? 'active' : ''}" onclick="setFilter('done')">
+                    ✅ Done <strong>${s.done}</strong>
+                </div>
+            `;
+        }
+
+        // --- SMART ALGORITHM: SORTING ---
+        function smartSort(leads) {
+            // Algorithm Priority Scores
+            return leads.sort((a, b) => {
+                const tempScore = { 'Hot': 3, 'Warm': 2, 'Cold': 1 };
+                // Updated Status Scores including new options
+                const statusScore = { 
+                    'New': 4, 
+                    'Call Back': 3, 
+                    'Not Answered': 3, 
+                    'Appointment Booked': 2, 
+                    'Interested': 2, 
+                    'Called': 1, 
+                    'Follow-Up': 1, 
+                    'Sale Confirmed': 0, 
+                    'Closed': 0 
+                };
+
+                const scoreA = (tempScore[a.temp] || 1) * 10 + (statusScore[a.status] || 0) + (parseFloat(a.rating||0));
+                const scoreB = (tempScore[b.temp] || 1) * 10 + (statusScore[b.status] || 0) + (parseFloat(b.rating||0));
+
+                return scoreB - scoreA; // Descending Score
+            });
         }
 
         // --- RENDERING LOGIC ---
@@ -450,49 +798,67 @@ Amit,8888888888,Delhi`;
             container.innerHTML = '';
 
             const searchTerm = els.searchInput.value.toLowerCase();
+            const filter = state.currentFilter;
 
-            // 1. Group by City
-            const cityGroups = {};
-            state.leads.forEach(lead => {
-                // Filter by search
-                if (searchTerm && !lead.name.toLowerCase().includes(searchTerm) && !lead.phone.includes(searchTerm)) {
-                    return;
-                }
+            // 1. Filter Leads
+            let filteredLeads = state.leads.filter(lead => {
+                const searchStr = (lead.name + lead.phone + (lead.business||'')).toLowerCase();
+                const matchesSearch = !searchTerm || searchStr.includes(searchTerm);
                 
-                const city = lead.city || 'Other';
-                if (!cityGroups[city]) cityGroups[city] = [];
-                cityGroups[city].push(lead);
+                if (!matchesSearch) return false;
+
+                if (filter === 'all') return true;
+                if (filter === 'Hot') return lead.temp === 'Hot';
+                // Updated Filters for New Statuses
+                if (filter === 'pending') return ['New', 'Not Answered', 'Call Back'].includes(lead.status);
+                if (filter === 'done') return !['New', 'Not Answered', 'Call Back'].includes(lead.status);
+                
+                return true;
             });
 
-            // 2. Render Groups
-            const cities = Object.keys(cityGroups).sort();
+            // 2. Apply Smart Algorithm (Sort)
+            filteredLeads = smartSort(filteredLeads);
+
+            // 3. Group by Detected Segment (defaulting to City or General)
+            const segmentGroups = {};
+            filteredLeads.forEach(lead => {
+                const segment = lead.segment || 'General';
+                if (!segmentGroups[segment]) segmentGroups[segment] = [];
+                segmentGroups[segment].push(lead);
+            });
+
+            // 4. Render Groups
+            const segments = Object.keys(segmentGroups).sort();
             
-            if (cities.length === 0) {
-                container.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">No leads found.</div>';
+            if (segments.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:40px 20px; color:var(--text-secondary);">
+                        <p>No leads match filter.</p>
+                        <button class="btn btn-outline mt-4" onclick="setFilter('all')">Show All</button>
+                    </div>`;
                 return;
             }
 
-            cities.forEach(city => {
-                const leadsInCity = cityGroups[city];
-                const isExpanded = state.expandedCities.has(city) || searchTerm.length > 0; // Auto expand on search
+            segments.forEach(seg => {
+                const leadsInSeg = segmentGroups[seg];
+                const isExpanded = state.expandedSegments.has(seg) || searchTerm.length > 0 || filter !== 'all';
 
-                // City Header
+                // Segment Header
                 const header = document.createElement('div');
-                header.className = 'city-header';
+                header.className = 'segment-header';
                 header.innerHTML = `
-                    <span>📍 ${city}</span>
-                    <span class="text-sm" style="background:white; padding:2px 8px; border-radius:12px;">${leadsInCity.length}</span>
+                    <span>📍 ${seg}</span>
+                    <span class="text-xs font-bold" style="background:#f3f4f6; padding:4px 8px; border-radius:8px;">${leadsInSeg.length}</span>
                 `;
-                header.onclick = () => toggleCity(city);
+                header.onclick = () => toggleSegment(seg);
                 container.appendChild(header);
 
                 // Leads List Wrapper
                 const listWrapper = document.createElement('div');
                 listWrapper.className = isExpanded ? '' : 'hidden';
                 
-                leadsInCity.forEach(lead => {
-                    const card = createLeadCard(lead);
-                    listWrapper.appendChild(card);
+                leadsInSeg.forEach(lead => {
+                    listWrapper.appendChild(createLeadCard(lead));
                 });
 
                 container.appendChild(listWrapper);
@@ -501,109 +867,194 @@ Amit,8888888888,Delhi`;
 
         function createLeadCard(lead) {
             const card = document.createElement('div');
-            card.className = `lead-card status-${lead.status.replace(' ','')}`;
+            // Temperature strip color class
+            const tempClass = `temp-${lead.temp.toLowerCase()}`;
+            card.className = `lead-card`;
             card.id = `lead-${lead.id}`;
 
-            const statusOptions = ['New', 'Called', 'Interested', 'Follow-Up', 'Closed', 'Not Answered'];
-            
-            let optionsHtml = '';
-            statusOptions.forEach(opt => {
-                optionsHtml += `<option value="${opt}" ${lead.status === opt ? 'selected' : ''}>${opt}</option>`;
-            });
+            // Status Badge Logic - Updated
+            let badgeClass = 'bg-closed';
+            if(lead.status === 'New') badgeClass = 'bg-new';
+            if(lead.status === 'Called') badgeClass = 'bg-called';
+            if(lead.status === 'Interested') badgeClass = 'bg-interested';
+            if(lead.status === 'Appointment Booked') badgeClass = 'bg-appointment';
+            if(lead.status === 'Sale Confirmed') badgeClass = 'bg-sale';
+            if(lead.status === 'Call Back') badgeClass = 'bg-callback';
+
+            // Business Line
+            const businessHtml = lead.business ? `<div class="text-sm font-bold text-primary mb-1">🏢 ${lead.business}</div>` : '';
+
+            // Meta Info (Rating/Reviews)
+            let metaHtml = '';
+            if(lead.rating || lead.reviews) {
+                metaHtml = `<div class="smart-tag mt-1">`;
+                if(lead.rating) metaHtml += `<span class="tag-rating">⭐ ${lead.rating}</span>`;
+                if(lead.reviews) metaHtml += `<span class="text-xs text-secondary ml-2">(${lead.reviews} reviews)</span>`;
+                
+                // Highlight High Value
+                if(parseFloat(lead.rating) >= 4.8 || parseInt(lead.reviews) > 50) {
+                     metaHtml += `<span class="tag-high-value ml-2">💎 High Value</span>`;
+                }
+                metaHtml += `</div>`;
+            }
+
+            // Algorithm Score Text
+            let scoreText = '';
+            if(lead.temp === 'Hot' && lead.status === 'New') scoreText = '🔥 Top Pick';
 
             card.innerHTML = `
-                <div class="flex justify-between items-center">
+                <div class="temp-strip ${tempClass}"></div>
+                
+                <div class="flex justify-between items-start mb-2" style="padding-left:10px;">
                     <div>
                         <h3 style="font-size:1.1rem;">${lead.name}</h3>
-                        <div class="text-sm mt-2">📱 ${formatPhone(lead.phone)}</div>
+                        ${businessHtml}
+                        <div class="text-sm mt-1" style="color:var(--text-secondary);">
+                            📱 ${formatPhone(lead.phone)}
+                        </div>
+                        ${metaHtml}
+                        ${scoreText ? `<div class="text-xs font-bold text-danger mt-1">${scoreText}</div>` : ''}
                     </div>
-                    <div style="text-align:right;">
-                        <span class="text-xs" style="text-transform:uppercase; font-weight:bold; opacity:0.6;">Status</span>
+                    <div style="text-align:right">
+                        <span class="status-badge ${badgeClass}">${lead.status}</span>
+                        <div class="text-xs text-secondary mt-1">${lead.city}</div>
                     </div>
-                </div>
-
-                <div class="mt-4 flex gap-4">
-                    <a href="tel:${lead.phone}" class="btn btn-call" style="flex:1;" onclick="markAsCalled('${lead.id}')">
-                        📞 Call
-                    </a>
                 </div>
 
                 <div class="mt-4">
-                    <select class="status-select" onchange="updateLeadStatus('${lead.id}', this.value)">
-                        ${optionsHtml}
-                    </select>
-                    <textarea class="notes-input" placeholder="Add notes here..." oninput="updateLeadNotes('${lead.id}', this.value)">${lead.notes}</textarea>
+                    <button class="btn btn-primary" onclick="openCallModal('${lead.id}')">
+                        📞 Call Now
+                    </button>
                 </div>
+
+                <div class="form-row">
+                    <div>
+                        <label class="text-xs font-bold">Status</label>
+                        <select class="custom-select mt-2" onchange="updateLeadField('${lead.id}', 'status', this.value)">
+                            <option value="New" ${lead.status === 'New' ? 'selected' : ''}>New</option>
+                            <option value="Call Back" ${lead.status === 'Call Back' ? 'selected' : ''}>Call Back</option>
+                            <option value="Appointment Booked" ${lead.status === 'Appointment Booked' ? 'selected' : ''}>Appointment Booked</option>
+                            <option value="Sale Confirmed" ${lead.status === 'Sale Confirmed' ? 'selected' : ''}>Sale Confirmed</option>
+                            <option value="Called" ${lead.status === 'Called' ? 'selected' : ''}>Called</option>
+                            <option value="Interested" ${lead.status === 'Interested' ? 'selected' : ''}>Interested</option>
+                            <option value="Follow-Up" ${lead.status === 'Follow-Up' ? 'selected' : ''}>Follow-Up</option>
+                            <option value="Closed" ${lead.status === 'Closed' ? 'selected' : ''}>Closed</option>
+                            <option value="Not Answered" ${lead.status === 'Not Answered' ? 'selected' : ''}>No Answer</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-xs font-bold">Temperature</label>
+                        <select class="custom-select mt-2" onchange="updateLeadField('${lead.id}', 'temp', this.value)">
+                            <option value="Hot" ${lead.temp === 'Hot' ? 'selected' : ''}>🔥 Hot</option>
+                            <option value="Warm" ${lead.temp === 'Warm' ? 'selected' : ''}>🌤 Warm</option>
+                            <option value="Cold" ${lead.temp === 'Cold' ? 'selected' : ''}>❄ Cold</option>
+                        </select>
+                    </div>
+                </div>
+
+                <textarea class="notes-input" placeholder="Notes..." oninput="updateLeadField('${lead.id}', 'notes', this.value)">${lead.notes}</textarea>
             `;
             return card;
         }
 
-        function toggleCity(city) {
-            if (state.expandedCities.has(city)) {
-                state.expandedCities.delete(city);
+        function toggleSegment(seg) {
+            if (state.expandedSegments.has(seg)) {
+                state.expandedSegments.delete(seg);
             } else {
-                state.expandedCities.add(city);
+                state.expandedSegments.add(seg);
             }
             renderLeads();
         }
 
-        // --- UPDATES & ACTIONS ---
+        // --- UPDATE LOGIC ---
 
-        function updateLeadStatus(id, newStatus) {
+        function updateLeadField(id, field, value) {
             const lead = state.leads.find(l => l.id === id);
             if (lead) {
-                lead.status = newStatus;
-                saveData();
-                // Update card visual class immediately without full re-render for performance
-                const card = document.getElementById(`lead-${id}`);
-                if(card) {
-                    card.className = card.className.replace(/status-[\w-]+/g, '') + ` status-${newStatus.replace(' ','')}`;
+                lead[field] = value;
+                saveData(); // Instant Auto-Save
+
+                if (field === 'status' || field === 'temp') {
+                    renderLeads(); 
                 }
             }
         }
 
-        function updateLeadNotes(id, notes) {
+        // --- CALLING LOGIC WITH MODAL ---
+        
+        // New: Centralized call execution function
+        function performCall(id) {
             const lead = state.leads.find(l => l.id === id);
-            if (lead) {
-                lead.notes = notes;
-                saveData(); // Note: frequent saving on keystroke. Could debounce, but localstorage is fast enough for this size.
+            if (!lead) return;
+
+            // 1. Auto Update Status if New
+            if (lead.status === 'New') {
+                lead.status = 'Called';
+                saveData();
+                renderLeads();
             }
+
+            // 2. Format Number for India
+            let rawPhone = lead.phone.replace(/\D/g, '');
+            if (rawPhone.length === 10) rawPhone = '+91' + rawPhone;
+            else if (!rawPhone.startsWith('+') && rawPhone.length > 0) rawPhone = '+' + rawPhone;
+
+            // 3. Dial
+            window.location.href = `tel:${rawPhone}`;
         }
 
-        function markAsCalled(id) {
-            // When user clicks Call, auto-update status to "Called" if it was "New"
+        function openCallModal(id) {
+            // New: Check for "Don't Ask Again" preference
+            if (localStorage.getItem(SKIP_CONFIRM_KEY) === 'true') {
+                performCall(id);
+                return;
+            }
+
             const lead = state.leads.find(l => l.id === id);
-            if (lead && lead.status === 'New') {
-                updateLeadStatus(id, 'Called');
-                // Reflect change in UI select box
-                const card = document.getElementById(`lead-${id}`);
-                const select = card.querySelector('select');
-                if (select) select.value = 'Called';
+            if(!lead) return;
+
+            state.pendingCallId = id;
+            els.modalLeadName.textContent = "Call " + lead.name + "?";
+            els.modalLeadPhone.textContent = formatPhone(lead.phone, true); // Force +91
+            
+            // Reset checkbox state
+            if(els.dontAskCheckbox) els.dontAskCheckbox.checked = false;
+
+            els.callModal.classList.remove('hidden');
+        }
+
+        function closeCallModal() {
+            els.callModal.classList.add('hidden');
+            state.pendingCallId = null;
+        }
+
+        els.confirmCallBtn.addEventListener('click', () => {
+            if(!state.pendingCallId) return;
+            
+            // New: Save preference if checked
+            if (els.dontAskCheckbox && els.dontAskCheckbox.checked) {
+                localStorage.setItem(SKIP_CONFIRM_KEY, 'true');
             }
-        }
 
-        function updateProgress() {
-            const total = state.leads.length;
-            if (total === 0) return;
+            performCall(state.pendingCallId);
+            closeCallModal();
+        });
 
-            const completed = state.leads.filter(l => l.status !== 'New').length;
-            const percent = Math.round((completed / total) * 100);
-
-            els.progressText.innerText = `${completed} / ${total}`;
-            els.progressBar.style.width = `${percent}%`;
-        }
-
-        // --- CALL NEXT LOGIC ---
+        // --- CALL NEXT WORKFLOW ---
         els.callNextBtn.addEventListener('click', () => {
-            // Find first lead that is 'New'
-            const nextLead = state.leads.find(l => l.status === 'New');
+            // Smart Sort determines order, so find first match in sorted list
+            const sorted = smartSort([...state.leads]); // Clone to avoid messing up main array order in case
+            const nextLead = sorted.find(l => l.status === 'New' || l.status === 'Not Answered' || l.status === 'Call Back');
             
             if (nextLead) {
-                // Ensure the city is expanded
-                state.expandedCities.add(nextLead.city);
+                const segment = nextLead.segment || 'General';
+                state.expandedSegments.add(segment);
+                if(state.currentFilter === 'done' || state.currentFilter === 'Hot') {
+                   state.currentFilter = 'all'; 
+                }
                 
-                // Need to re-render to ensure DOM element exists if city was closed
                 renderLeads(); 
+                renderStats();
 
                 setTimeout(() => {
                     const card = document.getElementById(`lead-${nextLead.id}`);
@@ -611,16 +1062,23 @@ Amit,8888888888,Delhi`;
                         card.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         card.classList.add('highlight');
                         setTimeout(() => card.classList.remove('highlight'), 2000);
+                        
+                        // Open confirmation instead of direct dial
+                        openCallModal(nextLead.id);
                     }
                 }, 100);
             } else {
-                alert("All leads called! Great job.");
+                alert("✅ All leads completed! Great job.");
             }
         });
 
         // --- UTILS ---
-        function formatPhone(phone) {
-            // Basic formatting
+        function formatPhone(phone, forceCountryCode = false) {
+            let cleaned = phone.replace(/\D/g, '');
+            // Simple logic: if 10 digits, assume India
+            if(forceCountryCode && cleaned.length === 10) {
+                return '+91 ' + cleaned.replace(/(\d{5})(\d{5})/, '$1 $2');
+            }
             return phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1 $2 $3');
         }
 
@@ -629,25 +1087,26 @@ Amit,8888888888,Delhi`;
         });
 
         els.resetBtn.addEventListener('click', () => {
-            if(confirm("Are you sure you want to delete all data and reset?")) {
+            if(confirm("⚠ Delete all data? This cannot be undone.")) {
                 localStorage.removeItem(APP_KEY);
+                // Also reset the call permission preference
+                localStorage.removeItem(SKIP_CONFIRM_KEY);
                 location.reload();
             }
         });
 
         els.exportBtn.addEventListener('click', () => {
-            // Simple CSV Export
             let csvContent = "data:text/csv;charset=utf-8,";
-            csvContent += "Name,Phone,City,Status,Notes\n";
+            csvContent += "Name,Phone,City,Business,Status,Temperature,Notes\n";
             
             state.leads.forEach(row => {
-                csvContent += `${row.name},${row.phone},${row.city},${row.status},"${row.notes.replace(/"/g, '""')}"\n`;
+                csvContent += `${row.name},${row.phone},${row.city},"${row.business}",${row.status},${row.temp},"${row.notes.replace(/"/g, '""')}"\n`;
             });
 
             const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
             link.setAttribute("href", encodedUri);
-            link.setAttribute("download", "own_it_leads_export.csv");
+            link.setAttribute("download", "own_it_leads.csv");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
