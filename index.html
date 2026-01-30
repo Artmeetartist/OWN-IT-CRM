@@ -658,11 +658,29 @@
                 }
 
                 // Smart Phone Logic
-                let phone = '';
-                if(colMap.phone > -1 && cols[colMap.phone]) phone = cols[colMap.phone];
+                let rawPhone = '';
+                if(colMap.phone > -1 && cols[colMap.phone]) rawPhone = cols[colMap.phone];
 
                 // Skip if no phone
-                if(!phone) continue;
+                if(!rawPhone) continue;
+
+                // Normalize to Indian Standard (+91)
+                let phone = rawPhone;
+                let digits = rawPhone.replace(/\D/g, '');
+                
+                // Handle 0-prefixed (098...)
+                if (digits.length === 11 && digits.startsWith('0')) {
+                    digits = digits.substring(1);
+                }
+                
+                // Handle 91-prefixed (9198...) without +
+                if (digits.length === 12 && digits.startsWith('91')) {
+                    digits = digits.substring(2);
+                }
+                
+                if (digits.length === 10) {
+                    phone = '+91 ' + digits.replace(/(\d{5})(\d{5})/, '$1 $2');
+                }
 
                 // Extraction
                 const city = (colMap.city > -1 && cols[colMap.city]) ? cols[colMap.city] : 'Unknown';
@@ -994,13 +1012,12 @@ Amit Patel,8888888888,Delhi,Patel Exports,4.0,15`;
                 renderLeads();
             }
 
-            // 2. Format Number for India
-            let rawPhone = lead.phone.replace(/\D/g, '');
-            if (rawPhone.length === 10) rawPhone = '+91' + rawPhone;
-            else if (!rawPhone.startsWith('+') && rawPhone.length > 0) rawPhone = '+' + rawPhone;
+            // 2. Number is already stored as +91 XXXXX XXXXX from parseCSV
+            // Just strip spaces for tel link
+            let dialNumber = lead.phone.replace(/\s+/g, '');
 
             // 3. Dial
-            window.location.href = `tel:${rawPhone}`;
+            window.location.href = `tel:${dialNumber}`;
         }
 
         function openCallModal(id) {
@@ -1015,7 +1032,8 @@ Amit Patel,8888888888,Delhi,Patel Exports,4.0,15`;
 
             state.pendingCallId = id;
             els.modalLeadName.textContent = "Call " + lead.name + "?";
-            els.modalLeadPhone.textContent = formatPhone(lead.phone, true); // Force +91
+            // Display phone number exactly as stored (already formatted)
+            els.modalLeadPhone.textContent = lead.phone;
             
             // Reset checkbox state
             if(els.dontAskCheckbox) els.dontAskCheckbox.checked = false;
@@ -1074,6 +1092,9 @@ Amit Patel,8888888888,Delhi,Patel Exports,4.0,15`;
 
         // --- UTILS ---
         function formatPhone(phone, forceCountryCode = false) {
+            // If already formatted as Indian number (starts with +91), return as is
+            if (phone.startsWith('+91')) return phone;
+            
             let cleaned = phone.replace(/\D/g, '');
             // Simple logic: if 10 digits, assume India
             if(forceCountryCode && cleaned.length === 10) {
